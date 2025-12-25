@@ -991,19 +991,25 @@ extension FormViewController : UITableViewDataSource {
     }
 
     open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard section >= 0, section < form.count else { return 0 }
         return form[section].count
     }
 
     open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    	form[indexPath].updateCell()
-        return form[indexPath].baseCell
+        guard let row = safeRow(at: indexPath) else {
+            return UITableViewCell(style: .default, reuseIdentifier: nil)
+        }
+        row.updateCell()
+        return row.baseCell
     }
 
     open func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard section >= 0, section < form.count else { return nil }
         return form[section].header?.title
     }
 
     open func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        guard section >= 0, section < form.count else { return nil }
         return form[section].footer?.title
     }
 
