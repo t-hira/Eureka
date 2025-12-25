@@ -1029,8 +1029,8 @@ extension FormViewController : UIScrollViewDelegate {
     // MARK: UIScrollViewDelegate
 
     open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        guard let tableView = tableView, scrollView === tableView else { return }
-        tableView.endEditing(true)
+        guard let tv = self.tableView, scrollView === tv else { return }
+        tv.endEditing(true)
     }
 }
 
