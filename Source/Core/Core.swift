@@ -941,18 +941,18 @@ extension FormViewController : UITableViewDelegate {
 
 	@available(iOS 11,*)
 	open func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard !form[indexPath].leadingSwipe.actions.isEmpty else {
-            return nil
-        }
-		return form[indexPath].leadingSwipe.contextualConfiguration
+        guard let row = safeRow(at: indexPath) else { return nil }
+        guard !row.leadingSwipe.actions.isEmpty else { return nil }
+        return row.leadingSwipe.contextualConfiguration
+
 	}
 
 	@available(iOS 11,*)
 	open func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard !form[indexPath].trailingSwipe.actions.isEmpty else {
-            return nil
-        }
-		return form[indexPath].trailingSwipe.contextualConfiguration
+        guard let row = safeRow(at: indexPath) else { return nil }
+        guard !row.trailingSwipe.actions.isEmpty else { return nil }
+        return row.trailingSwipe.contextualConfiguration
+
 	}
 
     @available(macCatalyst, deprecated: 13.1, message: "UITableViewRowAction is deprecated, use leading/trailingSwipe actions instead")
@@ -1147,5 +1147,14 @@ extension FormViewControllerProtocol {
         if cell.window == nil || (tableView.contentOffset.y + tableView.frame.size.height <= cell.frame.origin.y + cell.frame.size.height) {
             tableView.scrollToRow(at: indexPath, at: destinationScrollPosition, animated: true)
         }
+    }
+}
+
+private extension FormViewController {
+    func safeRow(at indexPath: IndexPath) -> BaseRow? {
+        guard indexPath.section >= 0, indexPath.section < form.count else { return nil }
+        let section = form[indexPath.section]
+        guard indexPath.row >= 0, indexPath.row < section.count else { return nil }
+        return section[indexPath.row]
     }
 }
