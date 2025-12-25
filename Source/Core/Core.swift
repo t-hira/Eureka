@@ -797,31 +797,35 @@ extension FormViewController : UITableViewDelegate {
 
     open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard tableView == self.tableView else { return tableView.rowHeight }
-        let row = form[indexPath.section][indexPath.row]
+        guard let row = safeRow(at: indexPath) else { return tableView.rowHeight }
         return row.baseCell.height?() ?? tableView.rowHeight
     }
 
     open func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         guard tableView == self.tableView else { return tableView.estimatedRowHeight }
-        let row = form[indexPath.section][indexPath.row]
+        guard let row = safeRow(at: indexPath) else { return tableView.estimatedRowHeight }
         return row.baseCell.height?() ?? tableView.estimatedRowHeight
     }
 
     open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard section >= 0, section < form.count else { return nil }
         return form[section].header?.viewForSection(form[section], type: .header)
     }
 
     open func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard section >= 0, section < form.count else { return nil }
         return form[section].footer?.viewForSection(form[section], type:.footer)
     }
 
     open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard section >= 0, section < form.count else { return UITableView.automaticDimension }
         return height(specifiedHeight: form[section].header?.height,
                       sectionView: self.tableView(tableView, viewForHeaderInSection: section),
                       sectionTitle: self.tableView(tableView, titleForHeaderInSection: section))
     }
 
     open func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard section >= 0, section < form.count else { return UITableView.automaticDimension }
         return height(specifiedHeight: form[section].footer?.height,
                       sectionView: self.tableView(tableView, viewForFooterInSection: section),
                       sectionTitle: self.tableView(tableView, titleForFooterInSection: section))
@@ -1125,7 +1129,8 @@ extension FormViewController {
     public func navigateTo(direction: Direction) {
         guard let currentCell = tableView?.findFirstResponder()?.formCell() else { return }
         guard let currentIndexPath = tableView?.indexPath(for: currentCell) else { return }
-        guard let nextRow = nextRow(for: form[currentIndexPath], withDirection: direction) else { return }
+        guard let currentRow = safeRow(at: currentIndexPath) else { return }
+        guard let nextRow = nextRow(for: currentRow, withDirection: direction) else { return }
         if nextRow.baseCell.cellCanBecomeFirstResponder() {
             tableView?.scrollToRow(at: nextRow.indexPath!, at: .none, animated: animateScroll)
             nextRow.baseCell.cellBecomeFirstResponder(withDirection: direction)
