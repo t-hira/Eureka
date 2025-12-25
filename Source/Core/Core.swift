@@ -45,10 +45,10 @@ internal class RowDefaults {
 public struct CellProvider<Cell: BaseCell> where Cell: CellType {
 
     /// Nibname of the cell that will be created.
-    public private (set) var nibName: String?
+    public private(set) var nibName: String?
 
     /// Bundle from which to get the nib file.
-    public private (set) var bundle: Bundle!
+    public private(set) var bundle: Bundle!
 
     public init() {}
 
