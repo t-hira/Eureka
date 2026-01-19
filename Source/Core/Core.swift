@@ -1176,21 +1176,19 @@ extension FormViewControllerProtocol {
 
 private extension FormViewController {
     func safeRow(at indexPath: IndexPath) -> BaseRow? {
-        // Avoid touching `form.count` (KVO-backed sections) which may trap during mutations.
-        // Best-effort: ask the tableView first (it is UIKit's source-of-truth for callbacks).
-        guard let tv = self.tableView else { return nil }
-
-        // If UIKit says this indexPath is not valid anymore, bail out.
+        // Be conservative: avoid touching UITableView APIs here because they can crash
+        // during accessibility-driven callbacks while the table view is being torn down.
         let sec = indexPath.section
         let row = indexPath.row
         guard sec >= 0, row >= 0 else { return nil }
-        guard sec < tv.numberOfSections else { return nil }
-        guard row < tv.numberOfRows(inSection: sec) else { return nil }
 
-        // Now try to fetch from Eureka. This can still fail if Eureka's model is mid-mutation,
-        // so keep it minimal and avoid `form.count`.
-        // We use `form[sec]` only after UIKit bounds checks.
-        let section = form[sec]
+        // Avoid `form.count` (KVO-backed) and avoid `tableView.numberOfRows`.
+        // Use the visible sections array directly.
+        let sections = form.kvoWrapper.sections
+        guard sec < sections.count else { return nil }
+        guard let section = sections.object(at: sec) as? Section else { return nil }
+
+        // Best-effort for rows
         guard row < section.count else { return nil }
         return section[row]
     }
