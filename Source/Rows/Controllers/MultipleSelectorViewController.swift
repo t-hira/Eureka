@@ -69,7 +69,9 @@ open class _MultipleSelectorViewController<Row: SelectableRowType, OptionsRow: O
     }
 
     open override func viewDidLoad() {
+        SelectableListAppearance.prepare(self)
         super.viewDidLoad()
+        SelectableListAppearance.apply(to: self)
         setupForm()
     }
 
@@ -89,7 +91,7 @@ open class _MultipleSelectorViewController<Row: SelectableRowType, OptionsRow: O
                                  footer: sectionFooterTitleForKey?(sectionKey))
             }
         } else {
-            form +++ section(with: options, header: row.title, footer: nil)
+            form +++ section(with: options, header: nil, footer: nil)
         }
     }
     
@@ -125,14 +127,22 @@ open class _MultipleSelectorViewController<Row: SelectableRowType, OptionsRow: O
                 lrow.title = String(describing: option)
                 lrow.selectableValue = option
                 lrow.value = self.row.value?.contains(option) ?? false ? option : nil
+                SelectableListAppearance.setupCell(lrow.baseCell)
                 self.selectableRowSetup?(lrow)
             }.cellSetup { [weak self] cell, row in
                 self?.selectableRowCellSetup?(cell, row)
+                SelectableListAppearance.setupCell(cell)
             }.cellUpdate { [weak self] cell, row in
                 self?.selectableRowCellUpdate?(cell, row)
+                SelectableListAppearance.setupCell(cell)
             }
         }
         return section
+    }
+
+    open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        SelectableListAppearance.animateSelection(for: tableView.cellForRow(at: indexPath))
+        super.tableView(tableView, didSelectRowAt: indexPath)
     }
 }
 

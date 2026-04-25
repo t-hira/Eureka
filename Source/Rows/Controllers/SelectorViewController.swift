@@ -103,6 +103,62 @@ public enum OptionsProvider<T: Equatable>: OptionsProviderConformance {
     }
 }
 
+enum SelectableListAppearance {
+
+    static func prepare(_ controller: FormViewController) {
+        controller.tableViewStyle = .insetGrouped
+    }
+
+    static func apply(to controller: FormViewController) {
+        controller.navigationItem.title = controller.title
+        controller.navigationItem.largeTitleDisplayMode = .never
+        controller.view.backgroundColor = .systemGroupedBackground
+
+        guard let tableView = controller.tableView else { return }
+        tableView.backgroundColor = .systemGroupedBackground
+        tableView.separatorStyle = .none
+        tableView.rowHeight = 58
+        tableView.estimatedRowHeight = 58
+        tableView.sectionFooterHeight = 12
+        tableView.contentInset.bottom = max(tableView.contentInset.bottom, 28)
+        tableView.verticalScrollIndicatorInsets.bottom = max(tableView.verticalScrollIndicatorInsets.bottom, 28)
+
+        if #available(iOS 15.0, *) {
+            tableView.sectionHeaderTopPadding = 8
+        }
+    }
+
+    static func setupCell(_ cell: BaseCell) {
+        cell.height = { 58 }
+        cell.backgroundColor = .secondarySystemGroupedBackground
+        cell.backgroundView = nil
+        cell.selectedBackgroundView = nil
+        cell.contentView.backgroundColor = .secondarySystemGroupedBackground
+        cell.preservesSuperviewLayoutMargins = true
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        cell.tintColor = .systemBlue
+        cell.selectionStyle = .default
+
+        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        cell.textLabel?.numberOfLines = 2
+        cell.textLabel?.textColor = .label
+        cell.detailTextLabel?.textColor = .secondaryLabel
+    }
+
+    static func animateSelection(for cell: UITableViewCell?) {
+        guard let cell = cell else { return }
+        UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction, .beginFromCurrentState]) {
+            cell.transform = CGAffineTransform(scaleX: 0.985, y: 0.985)
+        } completion: { _ in
+            UIView.animate(withDuration: 0.18, delay: 0, options: [.allowUserInteraction, .beginFromCurrentState]) {
+                cell.transform = .identity
+            }
+        }
+    }
+
+}
+
 open class _SelectorViewController<Row: SelectableRowType, OptionsRow: OptionsProviderRow>: FormViewController, TypedRowControllerType where Row: BaseRow, Row.Cell.Value == OptionsRow.OptionsProviderType.Option {
 
     /// The row that pushed or presented this controller
@@ -151,7 +207,9 @@ open class _SelectorViewController<Row: SelectableRowType, OptionsRow: OptionsPr
     }
 
     open override func viewDidLoad() {
+        SelectableListAppearance.prepare(self)
         super.viewDidLoad()
+        SelectableListAppearance.apply(to: self)
         setupForm()
     }
 
@@ -212,17 +270,25 @@ open class _SelectorViewController<Row: SelectableRowType, OptionsRow: OptionsPr
         }
         for option in options {
             section <<< Row.init(String(describing: option)) { lrow in
-                lrow.title = self.row.displayValueFor?(option)
+                lrow.title = self.row.displayValueFor?(option) ?? String(describing: option)
                 lrow.selectableValue = option
                 lrow.value = self.row.value == option ? option : nil
+                SelectableListAppearance.setupCell(lrow.baseCell)
                 self.selectableRowSetup?(lrow)
             }.cellSetup { [weak self] cell, row in
                 self?.selectableRowCellSetup?(cell, row)
+                SelectableListAppearance.setupCell(cell)
             }.cellUpdate { [weak self] cell, row in
                 self?.selectableRowCellUpdate?(cell, row)
+                SelectableListAppearance.setupCell(cell)
             }
         }
         return section
+    }
+
+    open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        SelectableListAppearance.animateSelection(for: tableView.cellForRow(at: indexPath))
+        super.tableView(tableView, didSelectRowAt: indexPath)
     }
 
 }
