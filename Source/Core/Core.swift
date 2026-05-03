@@ -959,26 +959,28 @@ extension FormViewController : UITableViewDelegate {
 	open func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let row = safeRow(at: indexPath) else { return nil }
         guard !row.leadingSwipe.actions.isEmpty else { return nil }
-        return row.leadingSwipe.contextualConfiguration
-
+        // BaseRow を強参照のまま UIContextualAction の構築を完了させ、
+        // SwipeConfiguration の弱参照が dangling になるのを防ぐ
+        return withExtendedLifetime(row) { row.leadingSwipe.contextualConfiguration }
 	}
 
 	@available(iOS 11,*)
 	open func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let row = safeRow(at: indexPath) else { return nil }
         guard !row.trailingSwipe.actions.isEmpty else { return nil }
-        return row.trailingSwipe.contextualConfiguration
-
+        return withExtendedLifetime(row) { row.trailingSwipe.contextualConfiguration }
 	}
 
     @available(macCatalyst, deprecated: 13.1, message: "UITableViewRowAction is deprecated, use leading/trailingSwipe actions instead")
     @available(iOS, deprecated: 13, message: "UITableViewRowAction is deprecated, use leading/trailingSwipe actions instead")
 	open func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]?{
         guard let row = safeRow(at: indexPath) else { return nil }
-        guard let actions = row.trailingSwipe.contextualActions as? [UITableViewRowAction], !actions.isEmpty else {
-            return nil
+        return withExtendedLifetime(row) { () -> [UITableViewRowAction]? in
+            guard let actions = row.trailingSwipe.contextualActions as? [UITableViewRowAction], !actions.isEmpty else {
+                return nil
+            }
+            return actions
         }
-        return actions
 	}
 }
 

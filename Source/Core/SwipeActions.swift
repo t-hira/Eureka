@@ -93,13 +93,15 @@ public class SwipeAction: ContextualAction {
 }
 
 public struct SwipeConfiguration {
-	
-    unowned var row: BaseRow
-    
+
+    // unowned だと最適化ビルドで BaseRow が早期解放され、UIContextualAction 構築中に
+    // dangling アクセス → EXC_BREAKPOINT になり得るため weak 参照に変更
+    weak var row: BaseRow?
+
 	init(_ row: BaseRow){
 		self.row = row
 	}
-	
+
 	public var performsFirstActionWithFullSwipe = false
 	public var actions: [SwipeAction] = []
 }
@@ -107,13 +109,17 @@ public struct SwipeConfiguration {
 extension SwipeConfiguration {
     @available(iOS 11.0, *)
     var contextualConfiguration: UISwipeActionsConfiguration? {
-        let contextualConfiguration = UISwipeActionsConfiguration(actions: self.contextualActions as! [UIContextualAction])
-        contextualConfiguration.performsFirstActionWithFullSwipe = self.performsFirstActionWithFullSwipe
-        return contextualConfiguration
+        guard let row = self.row else { return nil }
+        let mappedActions = self.actions.map { $0.contextualAction(forRow: row) }
+        guard let uiActions = mappedActions as? [UIContextualAction] else { return nil }
+        let configuration = UISwipeActionsConfiguration(actions: uiActions)
+        configuration.performsFirstActionWithFullSwipe = self.performsFirstActionWithFullSwipe
+        return configuration
     }
 
     var contextualActions: [ContextualAction]{
-        return self.actions.map { $0.contextualAction(forRow: self.row) }
+        guard let row = self.row else { return [] }
+        return self.actions.map { $0.contextualAction(forRow: row) }
     }
 }
 
