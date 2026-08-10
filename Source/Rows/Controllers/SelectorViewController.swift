@@ -106,22 +106,35 @@ public enum OptionsProvider<T: Equatable>: OptionsProviderConformance {
 enum SelectableListAppearance {
 
     static func prepare(_ controller: FormViewController) {
-        controller.tableViewStyle = .insetGrouped
+        if #available(iOS 13.0, *) {
+            controller.tableViewStyle = .insetGrouped
+        }
     }
 
     static func apply(to controller: FormViewController) {
         controller.navigationItem.title = controller.title
-        controller.navigationItem.largeTitleDisplayMode = .never
-        controller.view.backgroundColor = .systemGroupedBackground
+        if #available(iOS 11.0, *) {
+            controller.navigationItem.largeTitleDisplayMode = .never
+        }
+
+        if #available(iOS 13.0, *) {
+            controller.view.backgroundColor = .systemGroupedBackground
+        }
 
         guard let tableView = controller.tableView else { return }
-        tableView.backgroundColor = .systemGroupedBackground
+        if #available(iOS 13.0, *) {
+            tableView.backgroundColor = .systemGroupedBackground
+        }
         tableView.separatorStyle = .none
         tableView.rowHeight = 58
         tableView.estimatedRowHeight = 58
         tableView.sectionFooterHeight = 12
         tableView.contentInset.bottom = max(tableView.contentInset.bottom, 28)
-        tableView.verticalScrollIndicatorInsets.bottom = max(tableView.verticalScrollIndicatorInsets.bottom, 28)
+        if #available(iOS 11.1, *) {
+            tableView.verticalScrollIndicatorInsets.bottom = max(tableView.verticalScrollIndicatorInsets.bottom, 28)
+        } else {
+            tableView.scrollIndicatorInsets.bottom = max(tableView.scrollIndicatorInsets.bottom, 28)
+        }
 
         if #available(iOS 15.0, *) {
             tableView.sectionHeaderTopPadding = 8
@@ -130,20 +143,26 @@ enum SelectableListAppearance {
 
     static func setupCell(_ cell: BaseCell) {
         cell.height = { 58 }
-        cell.backgroundColor = .secondarySystemGroupedBackground
+        if #available(iOS 13.0, *) {
+            cell.backgroundColor = .secondarySystemGroupedBackground
+            cell.contentView.backgroundColor = .secondarySystemGroupedBackground
+        }
         cell.backgroundView = nil
         cell.selectedBackgroundView = nil
-        cell.contentView.backgroundColor = .secondarySystemGroupedBackground
         cell.preservesSuperviewLayoutMargins = true
         cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         cell.tintColor = .systemBlue
         cell.selectionStyle = .default
 
         cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        if #available(iOS 10.0, *) {
+            cell.textLabel?.adjustsFontForContentSizeCategory = true
+        }
         cell.textLabel?.numberOfLines = 2
-        cell.textLabel?.textColor = .label
-        cell.detailTextLabel?.textColor = .secondaryLabel
+        if #available(iOS 13.0, *) {
+            cell.textLabel?.textColor = .label
+            cell.detailTextLabel?.textColor = .secondaryLabel
+        }
     }
 
     static func animateSelection(for cell: UITableViewCell?) {

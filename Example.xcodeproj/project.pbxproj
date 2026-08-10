@@ -564,6 +564,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
+				"LM_SKIP_METADATA_EXTRACTION[sdk=iphoneos26*]" = YES;
+				"LM_SKIP_METADATA_EXTRACTION[sdk=iphonesimulator26*]" = YES;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -614,6 +618,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
+				"LM_SKIP_METADATA_EXTRACTION[sdk=iphoneos26*]" = YES;
+				"LM_SKIP_METADATA_EXTRACTION[sdk=iphonesimulator26*]" = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -631,6 +639,8 @@
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Example/Example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmartlabs.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -652,6 +662,8 @@
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Example/Example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmartlabs.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -667,6 +679,8 @@
 			buildSettings = {
 				INFOPLIST_FILE = Example/UITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmartlabs.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -681,6 +695,8 @@
 			buildSettings = {
 				INFOPLIST_FILE = Example/UITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos26*]" = 12.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator26*]" = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmartlabs.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

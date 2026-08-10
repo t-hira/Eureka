@@ -27,6 +27,8 @@ import Eureka
 
 /// Selector Controller used to pick an image
 open class ImagePickerController : UIImagePickerController, TypedRowControllerType, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+    private static let referenceURLKey = UIImagePickerController.InfoKey(rawValue: "UIImagePickerControllerReferenceURL")
     
     /// The row that pushed or presented this controller
     public var row: RowOf<UIImage>!
@@ -40,7 +42,7 @@ open class ImagePickerController : UIImagePickerController, TypedRowControllerTy
     }
 
     open func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        (row as? ImageRow)?.imageURL = info[.referenceURL] as? URL
+        (row as? ImageRow)?.imageURL = info[Self.referenceURLKey] as? URL
         row.value = info[.originalImage] as? UIImage
         onDismissCallback?(self)
     }
@@ -49,4 +51,3 @@ open class ImagePickerController : UIImagePickerController, TypedRowControllerTy
         onDismissCallback?(self)
     }
 }
-
