@@ -129,6 +129,8 @@ protocol ContextualAction {
     var title: String? { get set }
 }
 
+@available(macCatalyst, deprecated: 13.1, message: "UITableViewRowAction is deprecated, use UIContextualAction instead")
+@available(iOS, deprecated: 13.0, message: "UITableViewRowAction is deprecated, use UIContextualAction instead")
 extension UITableViewRowAction: ContextualAction {
     public var image: UIImage? {
         get { return nil }
@@ -152,6 +154,8 @@ extension UIContextualAction: ContextualAction {
 }
 
 public protocol ContextualStyle{}
+@available(macCatalyst, deprecated: 13.1, message: "UITableViewRowAction is deprecated, use UIContextualAction instead")
+@available(iOS, deprecated: 13.0, message: "UITableViewRowAction is deprecated, use UIContextualAction instead")
 extension UITableViewRowAction.Style: ContextualStyle {}
 
 @available(iOS 11.0, *)

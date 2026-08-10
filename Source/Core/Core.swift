@@ -1040,6 +1040,40 @@ extension FormViewController {
 
     // MARK: KeyBoard Notifications
 
+    private func setScrollIndicatorBottomInset(_ bottomInset: CGFloat, for tableView: UITableView) {
+        if #available(iOS 13.0, *) {
+            var verticalInsets = tableView.verticalScrollIndicatorInsets
+            verticalInsets.bottom = bottomInset
+            tableView.verticalScrollIndicatorInsets = verticalInsets
+
+            var horizontalInsets = tableView.horizontalScrollIndicatorInsets
+            horizontalInsets.bottom = bottomInset
+            tableView.horizontalScrollIndicatorInsets = horizontalInsets
+        } else {
+            var scrollIndicatorInsets = tableView.scrollIndicatorInsets
+            scrollIndicatorInsets.bottom = bottomInset
+            tableView.scrollIndicatorInsets = scrollIndicatorInsets
+        }
+    }
+
+    private func animateKeyboardTransition(
+        using keyBoardInfo: [AnyHashable: Any],
+        animations: @escaping () -> Void
+    ) {
+        let duration = keyBoardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double
+        let curve = UIView.AnimationCurve(
+            rawValue: keyBoardInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! Int
+        )!
+        let options = UIView.AnimationOptions(rawValue: UInt(curve.rawValue << 16))
+        UIView.animate(
+            withDuration: duration,
+            delay: 0,
+            options: options,
+            animations: animations,
+            completion: nil
+        )
+    }
+
     /**
      Called when the keyboard will appear. Adjusts insets of the tableView and scrolls it if necessary.
      */
@@ -1054,25 +1088,21 @@ extension FormViewController {
             newBottomInset = newBottomInset - tableView.safeAreaInsets.bottom
         }
         var tableInsets = table.contentInset
-        var scrollIndicatorInsets = table.scrollIndicatorInsets
         oldBottomInset = oldBottomInset ?? tableInsets.bottom
         if newBottomInset > oldBottomInset! {
             tableInsets.bottom = newBottomInset
-            scrollIndicatorInsets.bottom = tableInsets.bottom
-            UIView.beginAnimations(nil, context: nil)
-            UIView.setAnimationDuration((keyBoardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double))
-            UIView.setAnimationCurve(UIView.AnimationCurve(rawValue: (keyBoardInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! Int))!)
-            table.contentInset = tableInsets
-            table.scrollIndicatorInsets = scrollIndicatorInsets
-            if let selectedRow = table.indexPath(for: cell) {
-                if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 11 {
-                    let rect = table.rectForRow(at: selectedRow)
-                    table.scrollRectToVisible(rect, animated: animateScroll)
-                } else {
-                    table.scrollToRow(at: selectedRow, at: defaultScrollPosition, animated: animateScroll)
+            animateKeyboardTransition(using: keyBoardInfo) {
+                table.contentInset = tableInsets
+                self.setScrollIndicatorBottomInset(tableInsets.bottom, for: table)
+                if let selectedRow = table.indexPath(for: cell) {
+                    if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 11 {
+                        let rect = table.rectForRow(at: selectedRow)
+                        table.scrollRectToVisible(rect, animated: self.animateScroll)
+                    } else {
+                        table.scrollToRow(at: selectedRow, at: self.defaultScrollPosition, animated: self.animateScroll)
+                    }
                 }
             }
-            UIView.commitAnimations()
         }
     }
 
@@ -1083,16 +1113,12 @@ extension FormViewController {
         guard let table = tableView, let oldBottom = oldBottomInset else { return }
         let keyBoardInfo = notification.userInfo!
         var tableInsets = table.contentInset
-        var scrollIndicatorInsets = table.scrollIndicatorInsets
         tableInsets.bottom = oldBottom
-        scrollIndicatorInsets.bottom = tableInsets.bottom
         oldBottomInset = nil
-        UIView.beginAnimations(nil, context: nil)
-        UIView.setAnimationDuration((keyBoardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double))
-        UIView.setAnimationCurve(UIView.AnimationCurve(rawValue: (keyBoardInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! Int))!)
-        table.contentInset = tableInsets
-        table.scrollIndicatorInsets = scrollIndicatorInsets
-        UIView.commitAnimations()
+        animateKeyboardTransition(using: keyBoardInfo) {
+            table.contentInset = tableInsets
+            self.setScrollIndicatorBottomInset(tableInsets.bottom, for: table)
+        }
     }
 }
 
